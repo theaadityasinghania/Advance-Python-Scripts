@@ -12,7 +12,12 @@ def curl_post(url, iface=None):
     c.setopt(c.WRITEFUNCTION, buffer.write)
     if iface:
         c.setopt(c.INTERFACE, iface)
-    c.perform()
+
+    try:
+        c.perform()
+    except pycurl.error:
+        resp = ''
+        return resp
 
     # Json response
     resp = buffer.getvalue().decode('iso-8859-1')
@@ -31,9 +36,8 @@ def curl_post(url, iface=None):
 if __name__ == '__main__':
     interfaces = netifaces.interfaces()
     for interface in interfaces:
-        if interface != 'lo':
-            res = curl_post("https://www.google.com/", interface)
-            if res:
-                print(interface, 'Working.')
-            else:
-                print(interface, 'Seems blocked.')
+        res = curl_post("https://www.google.com/", interface)
+        if res:
+            print(interface, 'Working.')
+        else:
+            print(interface, 'Seems blocked.')
